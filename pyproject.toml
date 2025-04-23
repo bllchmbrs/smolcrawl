@@ -1,0 +1,20 @@
+[project]
+name = "smolcrawl"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "crawlee[all]>=0.6.7",
+    "diskcache>=5.6.3",
+    "loguru>=0.7.3",
+    "markdownify>=1.1.0",
+    "python-dotenv>=1.1.0",
+    "readabilipy>=0.3.0",
+    "rich>=14.0.0",
+    "tantivy>=0.22.2",
+    "typer>=0.15.2",
+]
+
+[project.scripts]
+smolcrawl = "smolcrawl:app"
