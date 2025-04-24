@@ -1,6 +1,6 @@
 [project]
 name = "smolcrawl"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
   { name="Bill Chambers", email="contact@learnbybuilding.ai" },
 ]
@@ -12,14 +12,6 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 license = "MIT"
-# license-files = ["LICEN[CS]E*"] # No license file
-
-[project.urls]
-Homepage = "https://github.com/bllchmbrs/smolcrawl"
-
-[build-system]
-requires = ["hatchling >= 1.26"]
-build-backend = "hatchling.build"
 dependencies = [
     "crawlee[all]>=0.6.7",
     "diskcache>=5.6.3",
@@ -31,6 +23,13 @@ dependencies = [
     "tantivy>=0.22.2",
     "typer>=0.15.2",
 ]
+[project.urls]
+Homepage = "https://github.com/bllchmbrs/smolcrawl"
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
 
 [dependency-groups]
 build = [
