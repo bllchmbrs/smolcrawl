@@ -1742,7 +1742,7 @@ dependencies = [
     { name = "typer" },
 ]
 
-[package.dev-dependencies]
+[package.optional-dependencies]
 build = [
     { name = "twine" },
 ]
@@ -1757,11 +1757,10 @@ requires-dist = [
     { name = "readabilipy", specifier = ">=0.3.0" },
     { name = "rich", specifier = ">=14.0.0" },
     { name = "tantivy", specifier = ">=0.22.2" },
+    { name = "twine", marker = "extra == 'build'", specifier = ">=6.1.0" },
     { name = "typer", specifier = ">=0.15.2" },
 ]
-
-[package.metadata.requires-dev]
-build = [{ name = "twine", specifier = ">=6.1.0" }]
+provides-extras = ["build"]
 
 [[package]]
 name = "sniffio"

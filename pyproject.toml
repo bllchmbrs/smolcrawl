@@ -1,6 +1,6 @@
 [project]
 name = "smolcrawl"
-version = "0.1.2"
+version = "0.1.3"
 authors = [
   { name="Bill Chambers", email="contact@learnbybuilding.ai" },
 ]
@@ -27,11 +27,11 @@ dependencies = [
 Homepage = "https://github.com/bllchmbrs/smolcrawl"
 
 [build-system]
-requires = ["hatchling >= 1.26"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
 
-[dependency-groups]
+[project.optional-dependencies]
 build = [
     "twine>=6.1.0",
 ]
