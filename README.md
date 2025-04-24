@@ -99,6 +99,18 @@ smolcrawl/
 3. **Indexing**: Stores extracted content in a Tantivy index for efficient searching
 4. **Searching**: Performs full-text search on indexed content with relevance ranking
 
+## Responsible Crawling
+
+SmolCrawl is a powerful tool, and with great power comes great responsibility. When crawling websites, please be mindful and respectful of the website owners and their resources.
+
+- **Check `robots.txt`**: Always check a website's `robots.txt` file (`https://example.com/robots.txt`) before crawling. Respect the rules outlined there regarding which paths are allowed or disallowed for crawling.
+- **Rate Limiting**: Avoid overwhelming the target server with too many requests in a short period. Implement delays between requests if necessary (SmolCrawl does not currently have built-in rate limiting).
+- **Identify Yourself**: Consider setting a descriptive User-Agent string to identify your crawler, although SmolCrawl does not currently support custom User-Agents.
+- **Crawl During Off-Peak Hours**: If possible, schedule crawls during times when the website is likely to have lower traffic.
+- **Use Caching**: Take advantage of SmolCrawl's caching feature to avoid re-downloading content unnecessarily.
+
+Misusing web crawlers can lead to your IP address being blocked and can negatively impact the performance and availability of the website for others. Use SmolCrawl ethically and responsibly.
+
 ## License
 
 [Your License Choice]

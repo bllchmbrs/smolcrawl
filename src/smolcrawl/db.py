@@ -135,13 +135,13 @@ class MarkdownFileIndexer:
         import pathlib
 
         parsed_url = urlparse(url)
-        path_parts = [part for part in parsed_url.path.split('/') if part]
+        path_parts = [part for part in parsed_url.path.split("/") if part]
 
         if not path_parts:
             filename = "index.md"
         else:
             last_part = path_parts[-1]
-            if '.' in last_part: # Assumes it's a file if it has an extension
+            if "." in last_part:  # Assumes it's a file if it has an extension
                 filename = pathlib.Path(last_part).stem + ".md"
                 path_parts = path_parts[:-1]
             else:
@@ -150,23 +150,23 @@ class MarkdownFileIndexer:
         dir_path = os.path.join(self.target_dir, *path_parts)
         return os.path.join(dir_path, filename)
 
-
     def add_page(self, page: Page):
         file_path = self._get_file_path(page.url)
         dir_path = os.path.dirname(file_path)
 
         try:
             os.makedirs(dir_path, exist_ok=True)
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.write(f"# {page.title}\n\n")
                 f.write(page.content)
             # logger.debug(f"Wrote page {page.url} to {file_path}")
         except OSError as e:
             logger.error(f"Error writing file {file_path} for url {page.url}: {e}")
 
-
     def add_pages(self, pages: List[Page]):
-        logger.info(f"Writing {len(pages)} pages to markdown files in {self.target_dir}")
+        logger.info(
+            f"Writing {len(pages)} pages to markdown files in {self.target_dir}"
+        )
         count = 0
         for page in pages:
             try:
@@ -174,7 +174,10 @@ class MarkdownFileIndexer:
                 count += 1
             except Exception as e:
                 logger.error(f"Failed to add page {page.url}: {e}")
-        logger.success(f"Successfully wrote {count}/{len(pages)} pages to {self.target_dir}")
+        logger.success(
+            f"Successfully wrote {count}/{len(pages)} pages to {self.target_dir}"
+        )
+
 
 class XmlFileIndexer:
     def __init__(self, index_name: str):
@@ -186,46 +189,41 @@ class XmlFileIndexer:
 
     def _to_pretty_xml(self, elem):
         """Return a pretty-printed XML string for the Element."""
-        rough_string = ET.tostring(elem, 'utf-8')
+        rough_string = ET.tostring(elem, "utf-8")
         reparsed = minidom.parseString(rough_string)
-        return reparsed.toprettyxml(indent="  ")
+        return reparsed.toprettyxml(indent="")
 
     def add_pages(self, pages: List[Page]):
         logger.info(f"Writing {len(pages)} pages to XML file {self.target_file}")
         count = 0
 
-        preamble = """<?xml version="1.0" ?>
-<crawled_pages>
-  This file contains crawled pages from websites, indexed by SmolCrawl.
-
-  <file_summary>
-    <purpose>
-      This file contains a collection of crawled web pages, suitable for creating searchable document collections.
-    </purpose>
-    <features>
-      - Crawled websites and extracted content
-      - Converted HTML content to readable markdown (in the content field)
-      - Indexed pages for efficient searching
-      - Query indexed content with relevance scoring
-    </features>
-    <usage_guidelines>
-      - This file is read-only.
-      - Use the 'url' attribute to identify the source of the content.
-      - The 'content' field contains the extracted and converted markdown.
-    </usage_guidelines>
-  </file_summary>
-</crawled_pages>
+        preamble = """<file_summary>
+This file contains crawled pages from websites, indexed by SmolCrawl.
+<purpose>
+    This file contains a collection of crawled web pages, suitable for creating searchable document collections.
+</purpose>
+<features>
+    - Crawled websites and extracted content
+    - Converted HTML content to readable markdown (in the content field)
+    - Indexed pages for efficient searching
+    - Query indexed content with relevance scoring
+</features>
+<usage_guidelines>
+    - This file is read-only.
+    - Use the 'url' attribute to identify the source of the content.
+    - The 'content' field contains the extracted and converted markdown.
+</usage_guidelines>
+</file_summary>
 """
 
-        root = ET.Element("crawled_pages")
-        pages_elem = ET.SubElement(root, "pages")
-        pages_elem.set("format", "markdown")
+        root = ET.Element("crawled_pages", attrib={"format": "markdown"})
 
         for page in pages:
             try:
-                page_elem = ET.SubElement(pages_elem, "page", attrib={"url": page.url, "title": page.title})
-                content_elem = ET.SubElement(page_elem, "content")
-                content_elem.text = page.content
+                page_elem = ET.SubElement(
+                    root, "page", attrib={"url": page.url, "title": page.title}
+                )
+                page_elem.text = "\n" + page.content
 
                 count += 1
             except Exception as e:
@@ -236,8 +234,10 @@ class XmlFileIndexer:
             pages_xml = self._to_pretty_xml(root)
             full_xml = preamble + pages_xml + "</crawled_pages>"
 
-            with open(self.target_file, 'w', encoding='utf-8') as f:
-                f.write(full_xml)
-            logger.success(f"Successfully wrote {count}/{len(pages)} pages to {self.target_file}")
+            with open(self.target_file, "w", encoding="utf-8") as f:
+                f.write(full_xml.replace('<?xml version="1.0" ?>\n', ""))
+            logger.success(
+                f"Successfully wrote {count}/{len(pages)} pages to {self.target_file}"
+            )
         except Exception as e:
             logger.error(f"Error writing XML file {self.target_file}: {e}")
