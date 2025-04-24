@@ -4,7 +4,7 @@ version = "0.1.7"
 authors = [
   { name="Bill Chambers", email="contact@learnbybuilding.ai" },
 ]
-description = "Crawls and indexes websites"
+description = "Crawls and indexes websites for local LLM work"
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [
