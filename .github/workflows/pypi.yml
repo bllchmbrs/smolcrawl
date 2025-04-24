@@ -1,11 +1,12 @@
 name: Upload Python Package
 
 on:
-#   release:
-#     types: [published]
   push:
     branches:
-      - master
+      - main
+#   release:
+#     types: [published]
+
 
 
 jobs:
