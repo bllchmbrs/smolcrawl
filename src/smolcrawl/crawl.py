@@ -10,7 +10,7 @@ from .utils import get_cache
 from .db import Page
 
 
-def replace_domained(url: str, domain_override: Optional[str]) -> str:
+def replace_domain(url: str, domain_override: Optional[str]) -> str:
     if domain_override:
         from urllib.parse import urlparse
 
@@ -60,6 +60,7 @@ def extract_from_response(url: str, response: HttpResponse) -> Page | None:
 
 
 async def crawl_target(target_url: str) -> List[Page]:
+    logger.info(f"Starting crawl of {target_url}")
     # BeautifulSoupCrawler crawls the web using HTTP requests
     # and parses HTML using the BeautifulSoup library.
     crawler = BeautifulSoupCrawler()
@@ -85,5 +86,6 @@ async def crawl_target(target_url: str) -> List[Page]:
     await crawler.run([target_url])
 
     pages_as_dicts = [page.model_dump() for page in pages]
+    logger.success(f"Crawled {len(pages)} pages from {target_url}")
     cache.set(target_url, pages_as_dicts, expire=72.0 * 3600)
     return pages
