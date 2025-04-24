@@ -1,6 +1,6 @@
 [project]
 name = "smolcrawl"
-version = "0.1.5"
+version = "0.1.6"
 authors = [
   { name="Bill Chambers", email="contact@learnbybuilding.ai" },
 ]
@@ -19,7 +19,7 @@ dependencies = [
     "markdownify>=1.1.0",
     "python-dotenv>=1.1.0",
     "readabilipy>=0.3.0",
-    "rich>=14.0.0",
+    "rich>=13.0.0",
     "tantivy>=0.22.2",
     "typer>=0.15.2",
 ]
