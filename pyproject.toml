@@ -26,15 +26,6 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/bllchmbrs/smolcrawl"
 
-[build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
-
-
-[project.optional-dependencies]
-build = [
-    "twine>=6.1.0",
-]
 
 [project.scripts]
 smolcrawl = "smolcrawl:app"
