@@ -19,7 +19,6 @@ dependencies = [
     "markdownify>=1.1.0",
     "python-dotenv>=1.1.0",
     "readabilipy>=0.3.0",
-    "rich>=13.0.0",
     "tantivy>=0.22.2",
     "typer>=0.15.2",
 ]
