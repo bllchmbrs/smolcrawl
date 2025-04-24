@@ -46,7 +46,7 @@ class Page(BaseModel):
 
 
 class TantivyIndexer:
-    def __init__(self, index_name: str):
+    def __init__(self, index_name: str, create_if_missing: bool = True):
         self.DB_PATH = os.path.join(get_storage_path(), "db", index_name)
         schema_builder = tantivy.SchemaBuilder()
         self.name = index_name
@@ -60,8 +60,11 @@ class TantivyIndexer:
         try:
             self.index = tantivy.Index.open(self.DB_PATH)
         except:
-            os.makedirs(self.DB_PATH, exist_ok=True)
-            self.index = tantivy.Index(self.schema, path=self.DB_PATH)
+            if create_if_missing:
+                os.makedirs(self.DB_PATH, exist_ok=True)
+                self.index = tantivy.Index(self.schema, path=self.DB_PATH)
+            else:
+                raise Exception(f"Index {self.name} does not exist at {self.DB_PATH}")
 
     def add_page(self, page: Page):
         writer = self.index.writer()
