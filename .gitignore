@@ -11,3 +11,4 @@ src/smolcrawl.egg-info
 repomix-output.*
 **/__pycache__
 dist/
+smolcrawl-data/

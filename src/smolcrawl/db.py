@@ -4,6 +4,8 @@ from smolcrawl.utils import get_storage_path
 from typing import List, Iterable, Set
 from pydantic import BaseModel
 from loguru import logger
+import xml.etree.ElementTree as ET
+from xml.dom import minidom
 
 
 class Section(BaseModel):
@@ -43,7 +45,7 @@ class Page(BaseModel):
         return sections
 
 
-class Indexer:
+class TantivyIndexer:
     def __init__(self, index_name: str):
         self.DB_PATH = os.path.join(get_storage_path(), "db", index_name)
         schema_builder = tantivy.SchemaBuilder()
@@ -119,3 +121,123 @@ class Indexer:
 
         logger.info(f"Found {len(output)} deduplicated results")
         return output
+
+
+class MarkdownFileIndexer:
+    def __init__(self, index_name: str):
+        self.target_dir = os.path.join(get_storage_path(), "markdown_files", index_name)
+        self.name = index_name
+        os.makedirs(self.target_dir, exist_ok=True)
+        logger.info(f"Initialized MarkdownFileIndexer writing to {self.target_dir}")
+
+    def _get_file_path(self, url: str) -> str:
+        from urllib.parse import urlparse
+        import pathlib
+
+        parsed_url = urlparse(url)
+        path_parts = [part for part in parsed_url.path.split('/') if part]
+
+        if not path_parts:
+            filename = "index.md"
+        else:
+            last_part = path_parts[-1]
+            if '.' in last_part: # Assumes it's a file if it has an extension
+                filename = pathlib.Path(last_part).stem + ".md"
+                path_parts = path_parts[:-1]
+            else:
+                filename = "index.md"
+
+        dir_path = os.path.join(self.target_dir, *path_parts)
+        return os.path.join(dir_path, filename)
+
+
+    def add_page(self, page: Page):
+        file_path = self._get_file_path(page.url)
+        dir_path = os.path.dirname(file_path)
+
+        try:
+            os.makedirs(dir_path, exist_ok=True)
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(f"# {page.title}\n\n")
+                f.write(page.content)
+            # logger.debug(f"Wrote page {page.url} to {file_path}")
+        except OSError as e:
+            logger.error(f"Error writing file {file_path} for url {page.url}: {e}")
+
+
+    def add_pages(self, pages: List[Page]):
+        logger.info(f"Writing {len(pages)} pages to markdown files in {self.target_dir}")
+        count = 0
+        for page in pages:
+            try:
+                self.add_page(page)
+                count += 1
+            except Exception as e:
+                logger.error(f"Failed to add page {page.url}: {e}")
+        logger.success(f"Successfully wrote {count}/{len(pages)} pages to {self.target_dir}")
+
+class XmlFileIndexer:
+    def __init__(self, index_name: str):
+        self.target_dir = os.path.join(get_storage_path(), "xml_files")
+        self.target_file = os.path.join(self.target_dir, f"{index_name}.xml")
+        self.name = index_name
+        os.makedirs(self.target_dir, exist_ok=True)
+        logger.info(f"Initialized XmlFileIndexer writing to {self.target_file}")
+
+    def _to_pretty_xml(self, elem):
+        """Return a pretty-printed XML string for the Element."""
+        rough_string = ET.tostring(elem, 'utf-8')
+        reparsed = minidom.parseString(rough_string)
+        return reparsed.toprettyxml(indent="  ")
+
+    def add_pages(self, pages: List[Page]):
+        logger.info(f"Writing {len(pages)} pages to XML file {self.target_file}")
+        count = 0
+
+        preamble = """<?xml version="1.0" ?>
+<crawled_pages>
+  This file contains crawled pages from websites, indexed by SmolCrawl.
+
+  <file_summary>
+    <purpose>
+      This file contains a collection of crawled web pages, suitable for creating searchable document collections.
+    </purpose>
+    <features>
+      - Crawled websites and extracted content
+      - Converted HTML content to readable markdown (in the content field)
+      - Indexed pages for efficient searching
+      - Query indexed content with relevance scoring
+    </features>
+    <usage_guidelines>
+      - This file is read-only.
+      - Use the 'url' attribute to identify the source of the content.
+      - The 'content' field contains the extracted and converted markdown.
+    </usage_guidelines>
+  </file_summary>
+</crawled_pages>
+"""
+
+        root = ET.Element("crawled_pages")
+        pages_elem = ET.SubElement(root, "pages")
+        pages_elem.set("format", "markdown")
+
+        for page in pages:
+            try:
+                page_elem = ET.SubElement(pages_elem, "page", attrib={"url": page.url, "title": page.title})
+                content_elem = ET.SubElement(page_elem, "content")
+                content_elem.text = page.content
+
+                count += 1
+            except Exception as e:
+                logger.error(f"Failed to add page {page.url} to XML: {e}")
+
+        try:
+            # Use minidom for pretty printing
+            pages_xml = self._to_pretty_xml(root)
+            full_xml = preamble + pages_xml + "</crawled_pages>"
+
+            with open(self.target_file, 'w', encoding='utf-8') as f:
+                f.write(full_xml)
+            logger.success(f"Successfully wrote {count}/{len(pages)} pages to {self.target_file}")
+        except Exception as e:
+            logger.error(f"Error writing XML file {self.target_file}: {e}")
