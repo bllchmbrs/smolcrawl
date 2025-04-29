@@ -12,3 +12,4 @@ repomix-output.*
 **/__pycache__
 dist/
 smolcrawl-data/
+blog/
