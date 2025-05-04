@@ -169,7 +169,7 @@ Misuse can lead to IP blocks and negatively impact website availability. Crawl r
 
 ## License
 
-[Your License Choice]
+MIT
 
 ## Contributing
 
